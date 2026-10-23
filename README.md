@@ -16,3 +16,19 @@
 
 Оновлення: веб-інтерфейс наземки → «Системні» → «Оновлення ПЗ наземки» → «Перевірити оновлення» → «Оновити».
 Перед оновленням наземка робить бекап; якщо щось пішло не так — кнопка «Відкотити на попередню».
+
+## Оновлення старої наземки прямо на ній (без кнопки у вебі)
+
+На наземці (потрібен інтернет), від root:
+```
+curl -fsSL https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/gs_update.sh | bash -s update
+```
+Відкат на попередню версію:
+```
+curl -fsSL https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/gs_update.sh | bash -s rollback
+```
+Стан (версія, остання операція, бекапи):
+```
+curl -fsSL https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/gs_update.sh | bash -s status
+```
+Після першого оновлення у вебі наземки з'являється картка «Оновлення ПЗ наземки».
