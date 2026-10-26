@@ -32,3 +32,16 @@ curl -fsSL https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/gs_update.s
 curl -fsSL https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/gs_update.sh | bash -s status
 ```
 Після першого оновлення у вебі наземки з'являється картка «Оновлення ПЗ наземки».
+
+## Розгортання передавача ZIRKA (Raspberry Pi 5) однією командою
+
+На новій малині ZIRKA (образ Zirka, потрібен інтернет):
+```
+curl -fsSL https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/zirka_install.sh | sudo bash
+```
+Скрипт бере пакет `zirka-deploy-<N>.tar.gz` з останнього релізу, **перевіряє підпис релізу** і контрольну суму,
+ставить драйвери RTL8812AU/EU + wfb-ng (готові під ядро Zirka; під інше ядро — збираються), wfbd, сервіси,
+агент зміни каналу, кнопку (коротко = bind, 15 с = відкат) і резервний маршрут відео без кабелю.
+Ядро, config.txt і софт Zirka не змінюються. Наприкінці показує ID плати для ліцензії.
+
+Секретних ключів у пакеті немає — їх ставить власник окремо зі свого ПК.

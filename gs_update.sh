@@ -31,7 +31,7 @@ case "$ACTION" in
     echo "завантажую останній реліз з github.com/$REPO ..."
     curl -fsSL -o "$T/manifest.json" "$URL/manifest.json"
     curl -fsSL -o "$T/manifest.sig"  "$URL/manifest.sig"
-    TGZ=$(python3 -c "import json;print([n for n in json.load(open('$T/manifest.json'))['files'] if n.endswith('.tar.gz')][0])")
+    TGZ=$(python3 -c "import json;print([n for n in json.load(open('$T/manifest.json'))['files'] if n.startswith('gs-') and n.endswith('.tar.gz')][0])")
     curl -fsSL -o "$T/$TGZ" "$URL/$TGZ"
     # оновлювач береться з НОВОГО релізу (у старої наземки його нема); підпис він перевіряє сам
     tar -xzf "$T/$TGZ" -C "$T/run" bin/gs_update
