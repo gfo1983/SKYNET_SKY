@@ -27,7 +27,7 @@ say "завантажую останній реліз з github.com/$REPO"
 curl -fsSL -o manifest.json "$URL/manifest.json"
 curl -fsSL -o manifest.sig "$URL/manifest.sig"
 printf '%s\n' "$PUB" > release_pub.pem
-base64 -d manifest.sig > manifest.sig.bin
+tr -d '\r\n' < manifest.sig | base64 -d > manifest.sig.bin
 openssl pkeyutl -verify -pubin -inkey release_pub.pem -rawin -in manifest.json -sigfile manifest.sig.bin >/dev/null \
     || { echo "ПІДПИС РЕЛІЗУ НЕВІРНИЙ — нічого не встановлюю"; exit 1; }
 say "підпис релізу вірний"
