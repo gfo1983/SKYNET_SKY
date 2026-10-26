@@ -7,8 +7,22 @@
 #   драйвери RTL8812AU/EU + wfb-ng (готові під ядро Zirka, інакше збираються), wfbd, wfb_lic, сервіси,
 #   агент зміни каналу, кнопка (коротко = bind, 15 с = відкат), резервний маршрут відео без кабелю.
 # Ядро, config.txt і софт Zirka не змінюються.
-# Секрети (bind-ключ, SSH-ключ борта) у публічному пакеті НЕМАЄ — їх ставлять окремо з ПК (zirka_keys.sh).
+# Секрети (bind-ключ, SSH-ключ борта) у публічному пакеті НЕМАЄ — вони приходять із ключем активації.
+#
+# БЕЗ ІНТЕРНЕТУ (з флешки): поруч із цим скриптом мають лежати manifest.json, manifest.sig і
+# zirka-deploy-<N>.tar.gz з одного релізу (їх кладе на флешку zirka_usb.ps1). Тоді:
+#   sudo bash /шлях/до/флешки/zirka_install.sh
+# Підпис і контрольна сума перевіряються так само, але без мережі.
 set -euo pipefail
+
+SELF_DIR=""
+if [ -n "${BASH_SOURCE[0]:-}" ] && [ -f "${BASH_SOURCE[0]}" ]; then    # run as a file (not piped from curl)
+    SELF_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
+LOCAL=""
+if [ -n "$SELF_DIR" ] && [ -f "$SELF_DIR/manifest.json" ] && [ -f "$SELF_DIR/manifest.sig" ]; then
+    LOCAL="$SELF_DIR"
+fi
 
 REPO="${SKY_REPO:-gfo1983/SKYNET_SKY}"
 URL="https://github.com/$REPO/releases/latest/download"
@@ -23,9 +37,14 @@ say() { echo "=== $*"; }
 grep -q "Raspberry Pi 5" /proc/device-tree/model 2>/dev/null || { echo "це не Raspberry Pi 5 — скрипт лише для ZIRKA"; exit 1; }
 
 rm -rf "$DIR" && mkdir -p "$DIR" && cd "$DIR"
-say "завантажую останній реліз з github.com/$REPO"
-curl -fsSL -o manifest.json "$URL/manifest.json"
-curl -fsSL -o manifest.sig "$URL/manifest.sig"
+if [ -n "$LOCAL" ]; then
+    say "встановлення БЕЗ інтернету з $LOCAL"
+    cp "$LOCAL/manifest.json" "$LOCAL/manifest.sig" .
+else
+    say "завантажую останній реліз з github.com/$REPO"
+    curl -fsSL -o manifest.json "$URL/manifest.json"
+    curl -fsSL -o manifest.sig "$URL/manifest.sig"
+fi
 printf '%s\n' "$PUB" > release_pub.pem
 tr -d '\r\n' < manifest.sig | base64 -d > manifest.sig.bin
 openssl pkeyutl -verify -pubin -inkey release_pub.pem -rawin -in manifest.json -sigfile manifest.sig.bin >/dev/null \
@@ -37,7 +56,12 @@ import json; m=json.load(open('manifest.json'))
 n=[k for k in m['files'] if k.startswith('zirka-deploy-')]
 print(n[0], m['files'][n[0]]['sha256']) if n else print('none none')")
 [ "$TGZ" != none ] || { echo "у релізі нема пакета ZIRKA"; exit 1; }
-curl -fsSL -o "$TGZ" "$URL/$TGZ"
+if [ -n "$LOCAL" ]; then
+    [ -f "$LOCAL/$TGZ" ] || { echo "на флешці нема $TGZ (має бути з того ж релізу, що й manifest.json)"; exit 1; }
+    cp "$LOCAL/$TGZ" .
+else
+    curl -fsSL -o "$TGZ" "$URL/$TGZ"
+fi
 echo "$SHA  $TGZ" | sha256sum -c --quiet || { echo "контрольна сума пакета не збігається"; exit 1; }
 REL=$(python3 -c "import json;print(json.load(open('manifest.json'))['version'])")
 say "пакет $TGZ (реліз №$REL) перевірено"

@@ -18,6 +18,26 @@ curl -fsSL https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/zirka_insta
   │  ІДЕНТИФІКАТОР ПРИСТРОЮ:  D86113115564365C18F1BAD463490124  │
 ```
 
+### 1а. Якщо на малині НЕМАЄ інтернету — встановлення з флешки
+
+На ПК з Windows та інтернетом (флешка вставлена, FAT32 або exFAT):
+```
+powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/zirka_usb.ps1 | iex"
+```
+Скрипт спитає букву флешки й покладе в папку `zirka` останній реліз (≈30 МБ, контрольна сума перевіряється).
+(Без PowerShell: зі сторінки https://github.com/gfo1983/SKYNET_SKY/releases/latest завантажте `manifest.json`,
+`manifest.sig`, `zirka-deploy-<N>.tar.gz`, а з головної сторінки репозиторію — `zirka_install.sh`, і покладіть
+усі чотири файли в папку `zirka` на флешці.)
+
+На малині вставте флешку і виконайте:
+```
+lsblk                                  # знайдіть флешку, напр. sda1
+sudo mount /dev/sda1 /mnt              # якщо не змонтувалась сама
+sudo bash /mnt/zirka/zirka_install.sh
+sudo umount /mnt
+```
+Далі все так само: підпис перевіряється без мережі, наприкінці — ідентифікатор пристрою.
+
 ## 2. Надіслати ідентифікатор постачальнику
 
 Скопіюйте **ідентифікатор пристрою** (32 символи) і надішліть постачальнику.

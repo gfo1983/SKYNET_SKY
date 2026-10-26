@@ -48,4 +48,8 @@ curl -fsSL https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/zirka_insta
 той видає **ключ активації**, і на малині: `sudo zirka-activate <КЛЮЧ>`.
 Покрокова інструкція для адміністратора: **[ZIRKA_ADMIN.md](ZIRKA_ADMIN.md)**.
 
+**Без інтернету на малині (з флешки):** на ПК з Windows
+`powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/gfo1983/SKYNET_SKY/main/zirka_usb.ps1 | iex"`
+→ на малині `sudo bash /<флешка>/zirka/zirka_install.sh`.
+
 Секретних ключів у публічному пакеті немає — вони приходять разом із ключем активації.
