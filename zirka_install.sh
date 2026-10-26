@@ -49,14 +49,17 @@ systemctl restart wfb-bindwatch wfb-led wfb-chanagent || true
 systemctl restart wfb-drone || true
 echo "$REL" > /etc/wfb_ng/deploy_release
 
-echo
-say "ГОТОВО: ZIRKA розгорнуто з релізу №$REL"
-if [ -f /etc/wfb_ng/bind_drone.key ]; then
-    echo "bind-ключ: є"
-else
-    echo "bind-ключ: НЕМАЄ — встановіть секрети з ПК:  ./zirka_keys.sh pi@<ip цієї малини>"
-fi
-echo "Ліцензія: ID цієї плати (надішліть для видачі ліцензії):"
-/usr/local/sbin/wfb-id || true
-echo "Далі: ліцензія (sudo wfb-license-install <КЛЮЧ>), потім BIND з наземкою (кнопка коротко)."
+ID=$(/usr/local/sbin/wfb-id 2>/dev/null || echo "?")
+echo "$ID" > /root/ZIRKA_DEVICE_ID.txt
 rm -rf "$DIR"
+echo
+say "ГОТОВО: софт ZIRKA розгорнуто (реліз №$REL)"
+echo
+echo "  ┌─────────────────────────────────────────────────────────────┐"
+echo "  │  ІДЕНТИФІКАТОР ПРИСТРОЮ:  $ID  │"
+echo "  └─────────────────────────────────────────────────────────────┘"
+echo "  (збережено в /root/ZIRKA_DEVICE_ID.txt; показати ще раз: sudo wfb-id)"
+echo
+echo "  1. Надішліть цей ідентифікатор постачальнику — він видасть КЛЮЧ АКТИВАЦІЇ."
+echo "  2. Отримавши ключ, виконайте на цій малині:  sudo zirka-activate <КЛЮЧ>"
+echo "  3. Потім BIND з наземкою (коротко натиснути кнопку бінду на борту)."
